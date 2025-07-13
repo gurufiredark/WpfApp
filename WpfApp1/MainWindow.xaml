@@ -5,8 +5,27 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="Sistema de Gestão" Height="600" Width="900"
+        xmlns:vm="clr-namespace:WpfApp1.ViewModels">
+
+    <Window.DataContext>
+        <vm:MainViewModel/>
+    </Window.DataContext>
+
     <Grid>
-        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Border Grid.Column="0" Background="#F0F0F0" BorderBrush="#D0D0D0" BorderThickness="0,0,1,0">
+            <StackPanel Width="150">
+                <Button Content="Pessoas" Command="{Binding ShowPessoasViewCommand}" Margin="10" Padding="5"/>
+                <Button Content="Produtos" Command="{Binding ShowProdutosViewCommand}" Margin="10,0,10,10" Padding="5"/>
+            </StackPanel>
+        </Border>
+
+        <ContentControl Grid.Column="1" Content="{Binding CurrentView}" Margin="10"/>
+
     </Grid>
 </Window>

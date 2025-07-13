@@ -2,22 +2,24 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using WpfApp1.Models;
+using WpfApp1.Services;
 using WpfApp1.Utils;
 
 namespace WpfApp1.ViewModels
 {
     public class PessoaViewModel : INotifyPropertyChanged
     {
-        #region Propriedades
+  
+        private readonly PersistenceService _persistenceService;
+        private readonly string _filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "pessoas.json");
+        private readonly ObservableCollection<Pessoa> _todasAsPessoas;
+        public ObservableCollection<Pessoa> PessoasFiltradas { get; set; }
 
-        //Para avisar a View sobre mudanças de dados
-        public ObservableCollection<Pessoa> Pessoas { get; set; }
-
+        #region Propriedades do Formulário e Seleção
         private string _nomeForm;
         public string NomeForm
         {
@@ -39,7 +41,6 @@ namespace WpfApp1.ViewModels
             set { _enderecoForm = value; OnPropertyChanged(nameof(EnderecoForm)); }
         }
 
-        // Guardar o item selecionado na DataGrid
         private Pessoa _pessoaSelecionada;
         public Pessoa PessoaSelecionada
         {
@@ -51,54 +52,85 @@ namespace WpfApp1.ViewModels
                 CarregarPessoaSelecionada();
             }
         }
-
         #endregion
 
-        #region Comandos (Ações dos Botões)
+        #region Propriedades de Pesquisa
+        private string _textoPesquisaNome;
+        public string TextoPesquisaNome
+        {
+            get => _textoPesquisaNome;
+            set { _textoPesquisaNome = value; OnPropertyChanged(nameof(TextoPesquisaNome)); }
+        }
 
+        private string _textoPesquisaCpf;
+        public string TextoPesquisaCpf
+        {
+            get => _textoPesquisaCpf;
+            set { _textoPesquisaCpf = value; OnPropertyChanged(nameof(TextoPesquisaCpf)); }
+        }
+        #endregion
+
+        #region Comandos
         public ICommand IncluirCommand { get; private set; }
         public ICommand SalvarCommand { get; private set; }
         public ICommand ExcluirCommand { get; private set; }
-
+        public ICommand PesquisarCommand { get; private set; }
         #endregion
 
         public PessoaViewModel()
         {
-            Pessoas = new ObservableCollection<Pessoa>();
+            _persistenceService = new PersistenceService();
 
-            // Instanciando os comandos
+            // Carrega os dados do arquivo
+            var pessoasSalvas = _persistenceService.Load<ObservableCollection<Pessoa>>(_filePath);
+            _todasAsPessoas = pessoasSalvas ?? new ObservableCollection<Pessoa>();
+
+            PessoasFiltradas = new ObservableCollection<Pessoa>(_todasAsPessoas);
+
             IncluirCommand = new RelayCommand(param => Incluir());
             SalvarCommand = new RelayCommand(param => Salvar());
-            ExcluirCommand = new RelayCommand(param => Excluir(), param => PessoaSelecionada != null); 
-
-            // --- PONTO IMPORTANTE ---
-            // No futuro, aqui você chamará o seu "Service" para carregar os dados do arquivo JSON/XML.
-            // Por enquanto, vamos adicionar dados de teste para ver a tela funcionando.
-            CarregarDadosDeTeste();
+            ExcluirCommand = new RelayCommand(param => Excluir(), param => PessoaSelecionada != null);
+            PesquisarCommand = new RelayCommand(param => Pesquisar());
         }
 
-        #region Métodos (Lógica dos Comandos)
+        #region Métodos de Lógica
+        private void Pesquisar()
+        {
+            IEnumerable<Pessoa> resultado = _todasAsPessoas;
+
+            if (!string.IsNullOrWhiteSpace(TextoPesquisaNome))
+            {
+                resultado = resultado.Where(p => p.Nome != null && p.Nome.ToLower().Contains(TextoPesquisaNome.ToLower()));
+            }
+
+            if (!string.IsNullOrWhiteSpace(TextoPesquisaCpf))
+            {
+                resultado = resultado.Where(p => p.CPF != null && p.CPF.Replace(".", "").Replace("-", "").Contains(TextoPesquisaCpf.Trim()));
+            }
+
+            PessoasFiltradas.Clear();
+            foreach (var pessoa in resultado)
+            {
+                PessoasFiltradas.Add(pessoa);
+            }
+        }
 
         private void Incluir()
         {
-            // Limpa o formulário e deseleciona qualquer item na grid
-            PessoaSelecionada = null; 
+            PessoaSelecionada = null;
             LimparFormulario();
         }
 
         private void Salvar()
         {
-            // Validação de CPF
-            if (string.IsNullOrWhiteSpace(CpfForm))
+            if (string.IsNullOrWhiteSpace(CpfForm) || string.IsNullOrWhiteSpace(NomeForm))
             {
                 return;
             }
 
-            // Se ninguém está selecionado, é uma Inclusão
-            if (PessoaSelecionada == null) 
+            if (PessoaSelecionada == null) // Inclusão
             {
-                int novoId = Pessoas.Any() ? Pessoas.Max(p => p.Id) + 1 : 1;
-
+                int novoId = _todasAsPessoas.Any() ? _todasAsPessoas.Max(p => p.Id) + 1 : 1;
                 var novaPessoa = new Pessoa
                 {
                     Id = novoId,
@@ -106,20 +138,21 @@ namespace WpfApp1.ViewModels
                     CPF = this.CpfForm,
                     Endereco = this.EnderecoForm
                 };
-                Pessoas.Add(novaPessoa);
+                _todasAsPessoas.Add(novaPessoa); // Adiciona na lista principal
             }
-            // Se alguém está selecionado, é uma Edição
-            else
+            else // Edição
             {
                 PessoaSelecionada.Nome = this.NomeForm;
                 PessoaSelecionada.CPF = this.CpfForm;
                 PessoaSelecionada.Endereco = this.EnderecoForm;
 
-                Pessoas[Pessoas.IndexOf(PessoaSelecionada)] = PessoaSelecionada;
+                int index = _todasAsPessoas.IndexOf(PessoaSelecionada);
+                if (index != -1) _todasAsPessoas[index] = PessoaSelecionada;
             }
 
-            // Futuramente, aqui você chamaria o seu "Service" para salvar a lista completa no arquivo.
+            _persistenceService.Save(_todasAsPessoas, _filePath);
 
+            Pesquisar();
             LimparFormulario();
         }
 
@@ -127,15 +160,16 @@ namespace WpfApp1.ViewModels
         {
             if (PessoaSelecionada != null)
             {
-                Pessoas.Remove(PessoaSelecionada);
+                _todasAsPessoas.Remove(PessoaSelecionada); // Remove da lista principal
+                _persistenceService.Save(_todasAsPessoas, _filePath);
+
+                Pesquisar(); // Atualiza a exibição
                 LimparFormulario();
             }
         }
-
         #endregion
 
         #region Métodos Auxiliares
-
         private void LimparFormulario()
         {
             NomeForm = string.Empty;
@@ -152,24 +186,14 @@ namespace WpfApp1.ViewModels
                 EnderecoForm = PessoaSelecionada.Endereco;
             }
         }
-
-        private void CarregarDadosDeTeste()
-        {
-            Pessoas.Add(new Pessoa { Id = 1, Nome = "João da Silva", CPF = "111.222.333-44", Endereco = "Rua A, 123" });
-            Pessoas.Add(new Pessoa { Id = 2, Nome = "Maria Oliveira", CPF = "555.666.777-88", Endereco = "Av. B, 456" });
-        }
-
         #endregion
 
         #region Implementação do INotifyPropertyChanged
-
-        // Para notificar a View
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-
         #endregion
     }
 }

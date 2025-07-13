@@ -1,0 +1,82 @@
+﻿<UserControl x:Class="WpfApp1.Views.PessoaView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1.Views"
+        mc:Ignorable="d"
+        xmlns:vm="clr-namespace:WpfApp1.ViewModels">
+
+    <UserControl.DataContext>
+        <vm:PessoaViewModel/>
+    </UserControl.DataContext>
+
+    <Grid Margin="15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" BorderBrush="LightGray" BorderThickness="0,0,0,1" Padding="0,0,0,15" Margin="0,0,0,15">
+            <StackPanel>
+                <TextBlock Text="Filtros de Pesquisa" FontWeight="Bold" FontSize="14" Margin="0,0,0,10"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                        <TextBlock Text="Pesquisar por Nome:"/>
+                        <TextBox Text="{Binding TextoPesquisaNome, UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Margin="10,0,0,0">
+                        <TextBlock Text="Pesquisar por CPF:"/>
+                        <TextBox Text="{Binding TextoPesquisaCpf, UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+
+                    <Button Grid.Column="2" Content="Pesquisar" Command="{Binding PesquisarCommand}" VerticalAlignment="Bottom" Padding="10,5"/>
+                </Grid>
+            </StackPanel>
+        </Border>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="250"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0" Margin="0,0,15,0">
+                <TextBlock Text="Nome:" FontWeight="Bold"/>
+                <TextBox Text="{Binding NomeForm, UpdateSourceTrigger=PropertyChanged}" Margin="0,5,0,0"/>
+
+                <TextBlock Text="CPF:" FontWeight="Bold" Margin="0,10,0,0"/>
+                <TextBox Text="{Binding CpfForm, UpdateSourceTrigger=PropertyChanged}" Margin="0,5,0,0"/>
+
+                <TextBlock Text="Endereço:" FontWeight="Bold" Margin="0,10,0,0"/>
+                <TextBox Text="{Binding EnderecoForm, UpdateSourceTrigger=PropertyChanged}" Margin="0,5,0,0" Height="60" TextWrapping="Wrap" AcceptsReturn="True"/>
+
+                <StackPanel Orientation="Horizontal" Margin="0,20,0,0">
+                    <Button Content="Incluir" Command="{Binding IncluirCommand}" Width="70"/>
+                    <Button Content="Salvar" Command="{Binding SalvarCommand}" Width="70" Margin="10,0,0,0"/>
+                    <Button Content="Excluir" Command="{Binding ExcluirCommand}" Width="70" Margin="10,0,0,0"/>
+                </StackPanel>
+            </StackPanel>
+
+            <DataGrid Grid.Column="1" 
+                      ItemsSource="{Binding PessoasFiltradas}" SelectedItem="{Binding PessoaSelecionada}"
+                      AutoGenerateColumns="False" 
+                      IsReadOnly="True"
+                      SelectionMode="Single">
+
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="Auto"/>
+                    <DataGridTextColumn Header="Nome" Binding="{Binding Nome}" Width="*"/>
+                    <DataGridTextColumn Header="CPF" Binding="{Binding CPF}" Width="1.5*"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+    </Grid>
+</UserControl>
