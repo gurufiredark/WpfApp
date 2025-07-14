@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Windows.Input;
+using WpfApp1.Models;
 using WpfApp1.Utils;
 using WpfApp1.Views;
 
@@ -22,8 +23,11 @@ namespace WpfApp1.ViewModels
         public ICommand ShowProdutosViewCommand { get; private set; }
         public ICommand ShowPedidosViewCommand { get; private set; }
 
+        public static MainViewModel Instance { get; private set; }
+
         public MainViewModel()
         {
+            Instance = this;
             ShowPessoasViewCommand = new RelayCommand(param => ShowPessoasView());
             ShowProdutosViewCommand = new RelayCommand(param => ShowProdutosView());
             ShowPedidosViewCommand = new RelayCommand(param => ShowPedidosView());
@@ -44,6 +48,15 @@ namespace WpfApp1.ViewModels
         private void ShowPedidosView()
         {
             CurrentView = new PedidoView();
+        }
+
+        public void ShowPedidoViewParaPessoa(Pessoa pessoa)
+        {
+            var pedidoViewModel = new PedidoViewModel(pessoa);
+
+            var pedidoView = new PedidoView { DataContext = pedidoViewModel };
+
+            CurrentView = pedidoView;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

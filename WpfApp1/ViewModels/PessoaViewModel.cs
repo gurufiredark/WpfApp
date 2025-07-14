@@ -74,6 +74,30 @@ namespace WpfApp1.ViewModels
         }
         #endregion
 
+        #region Propriedades de Filtro de Pedidos
+        // Propriedades para os checkboxes
+        private bool _mostrarApenasPagos;
+        public bool MostrarApenasPagos
+        {
+            get => _mostrarApenasPagos;
+            set { _mostrarApenasPagos = value; OnPropertyChanged(nameof(MostrarApenasPagos)); FiltrarPedidosDaPessoa(); }
+        }
+
+        private bool _mostrarApenasEntregues;
+        public bool MostrarApenasEntregues
+        {
+            get => _mostrarApenasEntregues;
+            set { _mostrarApenasEntregues = value; OnPropertyChanged(nameof(MostrarApenasEntregues)); FiltrarPedidosDaPessoa(); }
+        }
+
+        private bool _mostrarApenasPendentes;
+        public bool MostrarApenasPendentes
+        {
+            get => _mostrarApenasPendentes;
+            set { _mostrarApenasPendentes = value; OnPropertyChanged(nameof(MostrarApenasPendentes)); FiltrarPedidosDaPessoa(); }
+        }
+        #endregion
+
         #region Comandos
         public ICommand IncluirCommand { get; private set; }
         public ICommand SalvarCommand { get; private set; }
@@ -82,6 +106,7 @@ namespace WpfApp1.ViewModels
         public ICommand MarcarComoPagoCommand { get; private set; }
         public ICommand MarcarComoEnviadoCommand { get; private set; }
         public ICommand MarcarComoRecebidoCommand { get; private set; }
+        public ICommand IncluirPedidoCommand { get; private set; }
         #endregion
 
         public PessoaViewModel()
@@ -103,6 +128,8 @@ namespace WpfApp1.ViewModels
             MarcarComoPagoCommand = new RelayCommand(MarcarComoPago);
             MarcarComoEnviadoCommand = new RelayCommand(MarcarComoEnviado);
             MarcarComoRecebidoCommand = new RelayCommand(MarcarComoRecebido);
+
+            IncluirPedidoCommand = new RelayCommand(param => IncluirPedido(), param => PessoaSelecionada != null);
         }
 
         #region Métodos de Lógica
@@ -185,8 +212,26 @@ namespace WpfApp1.ViewModels
             PedidosDaPessoaSelecionada.Clear();
             if (PessoaSelecionada != null)
             {
-                var pedidos = _todosOsPedidos.Where(p => p.Pessoa.Id == PessoaSelecionada.Id);
-                foreach (var pedido in pedidos)
+                // Todos os pedidos da pessoa
+                IEnumerable<Pedido> pedidosFiltrados = _todosOsPedidos.Where(p => p.Pessoa.Id == PessoaSelecionada.Id);
+
+                // Aplica os filtros com base nos checkboxes
+                if (MostrarApenasPagos)
+                {
+                    pedidosFiltrados = pedidosFiltrados.Where(p => p.Status == StatusPedido.Pago);
+                }
+                if (MostrarApenasEntregues)
+                {
+                    // Um pedido entregue pode ter o status "Enviado" ou "Recebido"
+                    pedidosFiltrados = pedidosFiltrados.Where(p => p.Status == StatusPedido.Enviado || p.Status == StatusPedido.Recebido);
+                }
+                if (MostrarApenasPendentes)
+                {
+                    pedidosFiltrados = pedidosFiltrados.Where(p => p.Status == StatusPedido.Pendente);
+                }
+
+                // Para adiciona o resultado filtrado na lista
+                foreach (var pedido in pedidosFiltrados)
                 {
                     PedidosDaPessoaSelecionada.Add(pedido);
                 }
@@ -243,6 +288,11 @@ namespace WpfApp1.ViewModels
                 CpfForm = PessoaSelecionada.CPF;
                 EnderecoForm = PessoaSelecionada.Endereco;
             }
+        }
+        private void IncluirPedido()
+        {
+            // Pede para a MainViewModel mostrar a tela de pedido
+            MainViewModel.Instance?.ShowPedidoViewParaPessoa(PessoaSelecionada);
         }
         #endregion
 

@@ -89,6 +89,15 @@ namespace WpfApp1.ViewModels
             ItensDoPedidoAtual.CollectionChanged += (s, e) => CalcularTotal();
         }
 
+        public PedidoViewModel(Pessoa pessoa) : this()
+        {
+            if (pessoa != null)
+            {
+                // Encontra a pessoa na lista carregada e a define como selecionada
+                PessoaSelecionada = TodasAsPessoas.FirstOrDefault(p => p.Id == pessoa.Id);
+            }
+        }
+
         #region Métodos de Lógica
         private void AdicionarProduto()
         {
