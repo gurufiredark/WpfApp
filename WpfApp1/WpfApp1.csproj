@@ -71,6 +71,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Services\PersistenceService.cs" />
+    <Compile Include="Utils\CpfValidador.cs" />
     <Compile Include="Utils\RelayCommand.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\PedidoViewModel.cs" />

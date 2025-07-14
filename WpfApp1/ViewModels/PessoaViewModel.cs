@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 using WpfApp1.Models;
 using WpfApp1.Services;
@@ -163,11 +164,34 @@ namespace WpfApp1.ViewModels
 
         private void Salvar()
         {
+            // Validação de campos obrigatórios
             if (string.IsNullOrWhiteSpace(CpfForm) || string.IsNullOrWhiteSpace(NomeForm))
             {
+                MessageBox.Show("Os campos Nome e CPF são obrigatórios.", "Validação", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
+            // Remove a máscara e outros caracteres para validação e para salvar
+            var cpfApenasNumeros = new string(CpfForm.Where(char.IsDigit).ToArray());
+
+            // Verifica se o CPF tem 11 dígitos
+            if (cpfApenasNumeros.Length != 11)
+            {
+                MessageBox.Show("O CPF deve conter exatamente 11 dígitos.", "CPF Inválido", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            // Se esta incluindo uma nova pessoa OU editando para um novo CPF
+            if (PessoaSelecionada == null || new string(PessoaSelecionada.CPF.Where(char.IsDigit).ToArray()) != cpfApenasNumeros)
+            {
+                if (_todasAsPessoas.Any(p => new string(p.CPF.Where(char.IsDigit).ToArray()) == cpfApenasNumeros))
+                {
+                    MessageBox.Show("Este CPF já está cadastrado para outra pessoa.", "CPF Duplicado", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+            }
+
+            // Lógica para Salvar (Inclusão ou Edição)
             if (PessoaSelecionada == null) // Inclusão
             {
                 int novoId = _todasAsPessoas.Any() ? _todasAsPessoas.Max(p => p.Id) + 1 : 1;
@@ -175,7 +199,7 @@ namespace WpfApp1.ViewModels
                 {
                     Id = novoId,
                     Nome = this.NomeForm,
-                    CPF = this.CpfForm,
+                    CPF = this.CpfForm, // Salva com a máscara para exibição
                     Endereco = this.EnderecoForm
                 };
                 _todasAsPessoas.Add(novaPessoa);
@@ -183,7 +207,7 @@ namespace WpfApp1.ViewModels
             else // Edição
             {
                 PessoaSelecionada.Nome = this.NomeForm;
-                PessoaSelecionada.CPF = this.CpfForm;
+                PessoaSelecionada.CPF = this.CpfForm; // Salva com a máscara
                 PessoaSelecionada.Endereco = this.EnderecoForm;
 
                 int index = _todasAsPessoas.IndexOf(PessoaSelecionada);
@@ -191,9 +215,10 @@ namespace WpfApp1.ViewModels
             }
 
             _persistenceService.Save(_todasAsPessoas, _filePath);
-
             Pesquisar();
             LimparFormulario();
+
+            MessageBox.Show("Pessoa salva com sucesso!", "Sucesso", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void Excluir()
