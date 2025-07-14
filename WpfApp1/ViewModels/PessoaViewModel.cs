@@ -14,8 +14,9 @@ namespace WpfApp1.ViewModels
     public class PessoaViewModel : INotifyPropertyChanged
     {
         private readonly PersistenceService _persistenceService;
-        private readonly string _filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "pessoas.json");
-        private readonly string _pedidosFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "pedidos.json");
+        private static readonly string projectRoot = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.FullName;
+        private readonly string _filePath = Path.Combine(projectRoot, "Data", "pessoas.json");
+        private readonly string _pedidosFilePath = Path.Combine(projectRoot, "Data", "pedidos.json");
         private readonly ObservableCollection<Pessoa> _todasAsPessoas;
         private readonly ObservableCollection<Pedido> _todosOsPedidos;
 

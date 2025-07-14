@@ -14,7 +14,8 @@ namespace WpfApp1.ViewModels
     public class ProdutoViewModel : INotifyPropertyChanged
     {
         private readonly PersistenceService _persistenceService;
-        private readonly string _filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "produtos.json");
+        private static readonly string projectRoot = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.FullName;
+        private readonly string _filePath = Path.Combine(projectRoot, "Data", "produtos.json");
         private readonly ObservableCollection<Produto> _todosOsProdutos;
         public ObservableCollection<Produto> ProdutosFiltrados { get; set; }
 

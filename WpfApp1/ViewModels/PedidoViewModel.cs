@@ -13,9 +13,10 @@ namespace WpfApp1.ViewModels
     public class PedidoViewModel : INotifyPropertyChanged
     {
         private readonly PersistenceService _persistenceService;
-        private readonly string _pedidosFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "pedidos.json");
-        private readonly string _pessoasFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "pessoas.json");
-        private readonly string _produtosFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "produtos.json");
+        private static readonly string projectRoot = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.FullName;
+        private readonly string _pedidosFilePath = Path.Combine(projectRoot, "Data", "pedidos.json");
+        private readonly string _pessoasFilePath = Path.Combine(projectRoot, "Data", "pessoas.json");
+        private readonly string _produtosFilePath = Path.Combine(projectRoot, "Data", "produtos.json");
 
         #region Listas de Dados
         public ObservableCollection<Pessoa> TodasAsPessoas { get; set; }

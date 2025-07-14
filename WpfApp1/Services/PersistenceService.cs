@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace WpfApp1.Services
 {
@@ -12,14 +13,24 @@ namespace WpfApp1.Services
     { 
         public void Save<T>(T data, string filePath)
         {
-            var directory = Path.GetDirectoryName(filePath);
-            if (!Directory.Exists(directory))
+            try
             {
-            Directory.CreateDirectory(directory);
-            }
+                var directory = Path.GetDirectoryName(filePath);
 
-            var json = JsonConvert.SerializeObject(data, Formatting.Indented);
-            File.WriteAllText(filePath, json);      
+                // Se o diretório não existir, cria.
+                if (!Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+
+                var json = JsonConvert.SerializeObject(data, Formatting.Indented);
+                File.WriteAllText(filePath, json);
+
+            }
+            catch (System.Exception ex)
+            {
+                MessageBox.Show($"Ocorreu um erro ao salvar o arquivo:\n{ex.Message}\n\nCaminho: {filePath}", "Erro de Persistência");
+            }
         }
 
         public T Load<T>(string filePath)
