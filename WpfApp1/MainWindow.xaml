@@ -22,6 +22,7 @@
             <StackPanel Width="150">
                 <Button Content="Pessoas" Command="{Binding ShowPessoasViewCommand}" Margin="10" Padding="5"/>
                 <Button Content="Produtos" Command="{Binding ShowProdutosViewCommand}" Margin="10,0,10,10" Padding="5"/>
+                <Button Content="Pedidos" Command="{Binding ShowPedidosViewCommand}" Margin="10,0,10,10" Padding="5"/>
             </StackPanel>
         </Border>
 

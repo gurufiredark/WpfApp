@@ -15,7 +15,7 @@ namespace WpfApp1.Models
 
     public enum StatusPedido
     { 
-        Pedente,
+        Pendente,
         Pago,
         Enviado,
         Recebido

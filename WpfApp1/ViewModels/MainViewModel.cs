@@ -20,13 +20,15 @@ namespace WpfApp1.ViewModels
 
         public ICommand ShowPessoasViewCommand { get; private set; }
         public ICommand ShowProdutosViewCommand { get; private set; }
+        public ICommand ShowPedidosViewCommand { get; private set; }
 
         public MainViewModel()
         {
             ShowPessoasViewCommand = new RelayCommand(param => ShowPessoasView());
             ShowProdutosViewCommand = new RelayCommand(param => ShowProdutosView());
+            ShowPedidosViewCommand = new RelayCommand(param => ShowPedidosView());
 
-            // Define a tela inicial que será mostrada
+            // Tela inicial é a de Pessoas
             CurrentView = new PessoaView();
         }
 
@@ -38,6 +40,10 @@ namespace WpfApp1.ViewModels
         private void ShowProdutosView()
         {
             CurrentView = new ProdutoView();
+        }
+        private void ShowPedidosView()
+        {
+            CurrentView = new PedidoView();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

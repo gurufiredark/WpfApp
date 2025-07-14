@@ -1,0 +1,101 @@
+﻿<UserControl x:Class="WpfApp1.Views.PedidoView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfApp1.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="800"
+             xmlns:vm="clr-namespace:WpfApp1.ViewModels"
+             xmlns:models="clr-namespace:WpfApp1.Models">
+
+    <UserControl.DataContext>
+        <vm:PedidoViewModel/>
+    </UserControl.DataContext>
+
+    <UserControl.Resources>
+        <ObjectDataProvider x:Key="FormasDePagamento" MethodName="GetValues" ObjectType="{x:Type models:FormaDePagamento}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="models:FormaDePagamento"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+    </UserControl.Resources>
+
+    <Grid Margin="15">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="300"/>
+        </Grid.ColumnDefinitions>
+
+        <DockPanel Grid.Column="0" Margin="0,0,15,0">
+            <Border DockPanel.Dock="Top" BorderBrush="LightGray" BorderThickness="0,0,0,1" Padding="0,0,0,15" Margin="0,0,0,15">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="100"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                        <TextBlock Text="Selecione o Produto:" FontWeight="Bold"/>
+                        <ComboBox ItemsSource="{Binding TodosOsProdutos}" 
+                                  SelectedItem="{Binding ProdutoParaAdicionar}"
+                                  DisplayMemberPath="Nome"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Margin="10,0,0,0">
+                        <TextBlock Text="Quantidade:" FontWeight="Bold"/>
+                        <TextBox Text="{Binding QuantidadeParaAdicionar, UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+
+                    <Button Grid.Column="2" Content="Adicionar Produto" 
+                            Command="{Binding AdicionarProdutoCommand}" 
+                            VerticalAlignment="Bottom" Padding="10,5"/>
+                </Grid>
+            </Border>
+
+            <DataGrid ItemsSource="{Binding ItensDoPedidoAtual}" AutoGenerateColumns="False" IsReadOnly="True">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Produto" Binding="{Binding Produto.Nome}" Width="*"/>
+                    <DataGridTextColumn Header="Código" Binding="{Binding Produto.Codigo}" Width="Auto"/>
+                    <DataGridTextColumn Header="Vlr. Unit." Binding="{Binding Produto.Valor, StringFormat=C, ConverterCulture='pt-BR'}" Width="Auto"/>
+                    <DataGridTextColumn Header="Qtd." Binding="{Binding Quantidade}" Width="Auto"/>
+                    <DataGridTemplateColumn Width="Auto" MinWidth="70">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Content="Remover" 
+                                        Command="{Binding DataContext.RemoverItemCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                        CommandParameter="{Binding}"
+                                        Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </DockPanel>
+
+        <StackPanel Grid.Column="1">
+            <TextBlock Text="Detalhes do Pedido" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
+
+            <TextBlock Text="Cliente:" FontWeight="Bold"/>
+            <ComboBox ItemsSource="{Binding TodasAsPessoas}" 
+                      SelectedItem="{Binding PessoaSelecionada}"
+                      DisplayMemberPath="Nome" Margin="0,5,0,15"/>
+
+            <TextBlock Text="Forma de Pagamento:" FontWeight="Bold"/>
+            <ComboBox ItemsSource="{Binding Source={StaticResource FormasDePagamento}}"
+                      SelectedItem="{Binding FormaDePagamentoSelecionada}" Margin="0,5,0,15"/>
+
+            <Separator Margin="0,10"/>
+
+            <Grid Margin="0,10,0,20">
+                <TextBlock Text="Valor Total:" FontSize="18" FontWeight="Bold"/>
+                <TextBlock Text="{Binding ValorTotalPedidoAtual, StringFormat=C, ConverterCulture='pt-BR'}" 
+                           FontSize="22" FontWeight="ExtraBold" HorizontalAlignment="Right" Foreground="DarkGreen"/>
+            </Grid>
+
+            <Button Content="Finalizar Pedido" Command="{Binding FinalizarPedidoCommand}" Padding="10" FontSize="16" FontWeight="Bold"/>
+        </StackPanel>
+
+    </Grid>
+</UserControl>
