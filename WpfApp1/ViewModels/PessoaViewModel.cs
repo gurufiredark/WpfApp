@@ -13,10 +13,13 @@ namespace WpfApp1.ViewModels
 {
     public class PessoaViewModel : INotifyPropertyChanged
     {
-  
         private readonly PersistenceService _persistenceService;
         private readonly string _filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "pessoas.json");
+        private readonly string _pedidosFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "pedidos.json");
         private readonly ObservableCollection<Pessoa> _todasAsPessoas;
+        private readonly ObservableCollection<Pedido> _todosOsPedidos;
+
+        public ObservableCollection<Pedido> PedidosDaPessoaSelecionada { get; set; }
         public ObservableCollection<Pessoa> PessoasFiltradas { get; set; }
 
         #region Propriedades do Formulário e Seleção
@@ -50,6 +53,7 @@ namespace WpfApp1.ViewModels
                 _pessoaSelecionada = value;
                 OnPropertyChanged(nameof(PessoaSelecionada));
                 CarregarPessoaSelecionada();
+                FiltrarPedidosDaPessoa();
             }
         }
         #endregion
@@ -75,22 +79,30 @@ namespace WpfApp1.ViewModels
         public ICommand SalvarCommand { get; private set; }
         public ICommand ExcluirCommand { get; private set; }
         public ICommand PesquisarCommand { get; private set; }
+        public ICommand MarcarComoPagoCommand { get; private set; }
+        public ICommand MarcarComoEnviadoCommand { get; private set; }
+        public ICommand MarcarComoRecebidoCommand { get; private set; }
         #endregion
 
         public PessoaViewModel()
         {
             _persistenceService = new PersistenceService();
 
-            // Carrega os dados do arquivo
             var pessoasSalvas = _persistenceService.Load<ObservableCollection<Pessoa>>(_filePath);
             _todasAsPessoas = pessoasSalvas ?? new ObservableCollection<Pessoa>();
-
             PessoasFiltradas = new ObservableCollection<Pessoa>(_todasAsPessoas);
+
+            _todosOsPedidos = _persistenceService.Load<ObservableCollection<Pedido>>(_pedidosFilePath) ?? new ObservableCollection<Pedido>();
+            PedidosDaPessoaSelecionada = new ObservableCollection<Pedido>();
 
             IncluirCommand = new RelayCommand(param => Incluir());
             SalvarCommand = new RelayCommand(param => Salvar());
             ExcluirCommand = new RelayCommand(param => Excluir(), param => PessoaSelecionada != null);
             PesquisarCommand = new RelayCommand(param => Pesquisar());
+
+            MarcarComoPagoCommand = new RelayCommand(MarcarComoPago);
+            MarcarComoEnviadoCommand = new RelayCommand(MarcarComoEnviado);
+            MarcarComoRecebidoCommand = new RelayCommand(MarcarComoRecebido);
         }
 
         #region Métodos de Lógica
@@ -138,7 +150,7 @@ namespace WpfApp1.ViewModels
                     CPF = this.CpfForm,
                     Endereco = this.EnderecoForm
                 };
-                _todasAsPessoas.Add(novaPessoa); // Adiciona na lista principal
+                _todasAsPessoas.Add(novaPessoa);
             }
             else // Edição
             {
@@ -160,12 +172,58 @@ namespace WpfApp1.ViewModels
         {
             if (PessoaSelecionada != null)
             {
-                _todasAsPessoas.Remove(PessoaSelecionada); // Remove da lista principal
+                _todasAsPessoas.Remove(PessoaSelecionada);
                 _persistenceService.Save(_todasAsPessoas, _filePath);
 
-                Pesquisar(); // Atualiza a exibição
+                Pesquisar();
                 LimparFormulario();
             }
+        }
+
+        private void FiltrarPedidosDaPessoa()
+        {
+            PedidosDaPessoaSelecionada.Clear();
+            if (PessoaSelecionada != null)
+            {
+                var pedidos = _todosOsPedidos.Where(p => p.Pessoa.Id == PessoaSelecionada.Id);
+                foreach (var pedido in pedidos)
+                {
+                    PedidosDaPessoaSelecionada.Add(pedido);
+                }
+            }
+        }
+
+        private void MarcarComoPago(object pedido)
+        {
+            if (pedido is Pedido p)
+            {
+                p.Status = StatusPedido.Pago;
+                SalvarPedidos();
+            }
+        }
+
+        private void MarcarComoEnviado(object pedido)
+        {
+            if (pedido is Pedido p)
+            {
+                p.Status = StatusPedido.Enviado;
+                SalvarPedidos();
+            }
+        }
+
+        private void MarcarComoRecebido(object pedido)
+        {
+            if (pedido is Pedido p)
+            {
+                p.Status = StatusPedido.Recebido;
+                SalvarPedidos();
+            }
+        }
+
+        private void SalvarPedidos()
+        {
+            _persistenceService.Save(_todosOsPedidos, _pedidosFilePath);
+            FiltrarPedidosDaPessoa();
         }
         #endregion
 
