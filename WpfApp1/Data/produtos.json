@@ -1,0 +1,26 @@
+[
+  {
+    "Id": 1,
+    "Nome": "Iphone 16",
+    "Codigo": "1",
+    "Valor": 6000.0
+  },
+  {
+    "Id": 2,
+    "Nome": "Monitor",
+    "Codigo": "2",
+    "Valor": 1000.0
+  },
+  {
+    "Id": 3,
+    "Nome": "Controle Xbox",
+    "Codigo": "3",
+    "Valor": 330.0
+  },
+  {
+    "Id": 4,
+    "Nome": "Playstation 5",
+    "Codigo": "4",
+    "Valor": 3500.0
+  }
+]

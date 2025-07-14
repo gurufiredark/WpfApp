@@ -1,0 +1,77 @@
+[
+  {
+    "Id": 1,
+    "DataDaVenda": "2025-07-14T02:35:30.8175445-03:00",
+    "Pessoa": {
+      "Id": 1,
+      "Nome": "Gabriel",
+      "CPF": "12345891994",
+      "Endereco": null
+    },
+    "Produtos": [
+      {
+        "Produto": {
+          "Id": 4,
+          "Nome": "Playstation 5",
+          "Codigo": "4",
+          "Valor": 3500.0
+        },
+        "Quantidade": 1
+      },
+      {
+        "Produto": {
+          "Id": 3,
+          "Nome": "Controle Xbox",
+          "Codigo": "3",
+          "Valor": 330.0
+        },
+        "Quantidade": 1
+      },
+      {
+        "Produto": {
+          "Id": 2,
+          "Nome": "Monitor",
+          "Codigo": "2",
+          "Valor": 1000.0
+        },
+        "Quantidade": 2
+      },
+      {
+        "Produto": {
+          "Id": 1,
+          "Nome": "Iphone 16",
+          "Codigo": "1",
+          "Valor": 6000.0
+        },
+        "Quantidade": 1
+      }
+    ],
+    "FormaDePagamento": 0,
+    "Status": 3,
+    "ValorTotal": 11830.0
+  },
+  {
+    "Id": 2,
+    "DataDaVenda": "2025-07-14T02:41:53.398918-03:00",
+    "Pessoa": {
+      "Id": 2,
+      "Nome": "João Pedro",
+      "CPF": "123.456.321-90",
+      "Endereco": ""
+    },
+    "Produtos": [
+      {
+        "Produto": {
+          "Id": 2,
+          "Nome": "Monitor",
+          "Codigo": "2",
+          "Valor": 1000.0
+        },
+        "Quantidade": 1
+      }
+    ],
+    "FormaDePagamento": 0,
+    "Status": 0,
+    "ValorTotal": 1000.0
+  }
+]
