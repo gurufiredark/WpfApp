@@ -1,12 +1,10 @@
 
 # Sistema de Gestão de Pessoas, Produtos e Pedidos
 
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/gurufiredark/WpfApp)
 [![.NET Framework](https://img.shields.io/badge/.NET-Framework%204.6-blue)](https://dotnet.microsoft.com/)
 [![WPF](https://img.shields.io/badge/WPF-Windows%20Presentation%20Foundation-lightgrey)](https://learn.microsoft.com/dotnet/desktop/wpf/)
 [![License](https://img.shields.io/github/license/gurufiredark/WpfApp)](https://github.com/gurufiredark/WpfApp/blob/main/LICENSE)
 [![Made with C#](https://img.shields.io/badge/Made%20with-C%23-239120?logo=c-sharp&logoColor=white)](https://learn.microsoft.com/dotnet/csharp/)
-[![Last Commit](https://img.shields.io/github/last-commit/gurufiredark/WpfApp)](https://github.com/gurufiredark/WpfApp)
 
 ---
 
@@ -96,8 +94,4 @@ A organização segue o padrão **MVVM**, promovendo modularidade e separação 
 ├── Data          # Arquivos JSON persistentes (pessoas.json, produtos.json, pedidos.json)
 ```
 
----
 
-## Licença
-
-Distribuído sob a licença MIT. Veja o arquivo [LICENSE](https://github.com/gurufiredark/WpfApp/blob/main/LICENSE) para mais informações.
